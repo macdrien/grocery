@@ -52,7 +52,6 @@ public class SecurityConfiguration {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(configurer -> configurer.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
                 .authorizeHttpRequests(customizer -> {
-                    customizer.requestMatchers("/admin/**").hasRole("ADMIN");
                     customizer.requestMatchers("/authentication").authenticated();
                     customizer.requestMatchers("/h2-console").permitAll();
                     customizer.anyRequest().authenticated();
