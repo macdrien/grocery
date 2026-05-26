@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import fr.sidranie.grocery.Response;
 import fr.sidranie.grocery.data.slug.Slug;
+import fr.sidranie.grocery.security.RoleAdmin;
 
 @RestController
 @RequestMapping("/products")
@@ -39,6 +40,7 @@ public class ProductController {
     }
 
     @PostMapping
+    @RoleAdmin
     public ResponseEntity<Response<Product>> createProduct(@RequestBody Product product) {
         Product saved;
         try {
