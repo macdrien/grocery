@@ -1,4 +1,4 @@
-package fr.sidranie.grocery.configuration;
+package fr.sidranie.grocery.security;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
