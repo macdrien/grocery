@@ -1,7 +1,14 @@
 package fr.sidranie.grocery.product;
 
+import fr.sidranie.grocery.data.identifier.Identifier;
+import fr.sidranie.grocery.data.identifier.IdentifierConverter;
+import fr.sidranie.grocery.data.slug.Slug;
+import fr.sidranie.grocery.data.slug.SlugConverter;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
@@ -9,13 +16,16 @@ import jakarta.persistence.Table;
 @Table(name = "products")
 public class Product {
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @Column(nullable = false)
-    private String name;
+    @Convert(converter = IdentifierConverter.class)
+    private Identifier name;
 
-    @Column(nullable = false)
-    private String slug;
+    @Column(nullable = false, unique = true)
+    @Convert(converter = SlugConverter.class)
+    private Slug slug;
 
     public Long getId() {
         return id;
@@ -25,19 +35,28 @@ public class Product {
         this.id = id;
     }
 
-    public String getName() {
+    public Identifier getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public void setName(Identifier name) {
         this.name = name;
     }
 
-    public String getSlug() {
+    public Slug getSlug() {
         return slug;
     }
 
-    public void setSlug(String slug) {
+    public void setSlug(Slug slug) {
         this.slug = slug;
+    }
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "id=" + id +
+                ", name='" + name +
+                "', slug='" + slug +
+                "'}";
     }
 }

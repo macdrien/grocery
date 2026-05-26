@@ -1,8 +1,9 @@
 package fr.sidranie.grocery.product;
 
-import fr.sidranie.grocery.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import fr.sidranie.grocery.data.slug.Slug;
 
 @Service
 public class ProductService {
@@ -14,10 +15,19 @@ public class ProductService {
         this.products = products;
     }
 
-    public Product save(Product product) {
+    public Product save(Product product) throws IllegalArgumentException {
+        if (products.existsByName(product.getName())) {
+            throw new IllegalArgumentException("A product with the name " + product.getName() + " already exists. Please choose another one.");
+        }
+        Slug slug = Slug.fromString(product.getName().getValue());
+
+        if (products.existsBySlug(slug)) {
+            throw new IllegalArgumentException("The generated slug (" + product.getSlug() + ") already exists. Please choose another name to generate another slug.");
+        }
+
         product.setId(null);
-        product.setSlug(StringUtils.toSlug(product.getName()));
-        Product saved = products.save(product);
-        return saved;
+        product.setSlug(slug);
+
+        return products.save(product);
     }
 }
