@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import fr.sidranie.grocery.Response;
 import fr.sidranie.grocery.data.slug.Slug;
+import fr.sidranie.grocery.exception.NotFoundException;
 import fr.sidranie.grocery.security.RoleAdmin;
 
 @RestController
@@ -45,9 +47,24 @@ public class ProductController {
         Product saved;
         try {
             saved = productService.save(product);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(new Response<>(e.getMessage()));
+        } catch (IllegalArgumentException exception) {
+            return ResponseEntity.badRequest().body(new Response<>(exception.getMessage()));
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(new Response<>(saved));
+    }
+
+    @PatchMapping("/{slug}")
+    @RoleAdmin
+    public ResponseEntity<Response<Product>> updateProduct(@PathVariable("slug") Slug slug,
+                                                           @RequestBody Product product) {
+        Product saved;
+        try {
+            saved = productService.updateProduct(slug, product);
+        } catch (IllegalArgumentException exception) {
+            return ResponseEntity.badRequest().body(new Response<>(exception.getMessage()));
+        } catch (NotFoundException _) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(new Response<>(saved));
     }
 }
