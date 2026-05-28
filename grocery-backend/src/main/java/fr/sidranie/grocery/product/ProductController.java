@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 import fr.sidranie.grocery.Response;
 import fr.sidranie.grocery.data.slug.Slug;
 import fr.sidranie.grocery.exception.NotFoundException;
+import fr.sidranie.grocery.product.dto.ProductDto;
+import fr.sidranie.grocery.product.transformer.ProductTransformer;
 import fr.sidranie.grocery.security.RoleAdmin;
 
 @RestController
@@ -43,10 +45,11 @@ public class ProductController {
 
     @PostMapping
     @RoleAdmin
-    public ResponseEntity<Response<Product>> createProduct(@RequestBody Product product) {
+    public ResponseEntity<Response<Product>> createProduct(@RequestBody ProductDto productDto) {
+        Product input = ProductTransformer.productFromProductDto(productDto);
         Product saved;
         try {
-            saved = productService.save(product);
+            saved = productService.save(input);
         } catch (IllegalArgumentException exception) {
             return ResponseEntity.badRequest().body(new Response<>(exception.getMessage()));
         }
@@ -56,10 +59,11 @@ public class ProductController {
     @PatchMapping("/{slug}")
     @RoleAdmin
     public ResponseEntity<Response<Product>> updateProduct(@PathVariable("slug") Slug slug,
-                                                           @RequestBody Product product) {
+                                                           @RequestBody ProductDto productDto) {
+        Product input = ProductTransformer.productFromProductDto(productDto);
         Product saved;
         try {
-            saved = productService.updateProduct(slug, product);
+            saved = productService.updateProduct(slug, input);
         } catch (IllegalArgumentException exception) {
             return ResponseEntity.badRequest().body(new Response<>(exception.getMessage()));
         } catch (NotFoundException _) {
