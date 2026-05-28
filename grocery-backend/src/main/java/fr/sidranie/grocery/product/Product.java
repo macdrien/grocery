@@ -2,6 +2,8 @@ package fr.sidranie.grocery.product;
 
 import fr.sidranie.grocery.data.identifier.Identifier;
 import fr.sidranie.grocery.data.identifier.IdentifierConverter;
+import fr.sidranie.grocery.data.price.Price;
+import fr.sidranie.grocery.data.price.PriceConverter;
 import fr.sidranie.grocery.data.slug.Slug;
 import fr.sidranie.grocery.data.slug.SlugConverter;
 import jakarta.persistence.Column;
@@ -27,6 +29,10 @@ public class Product {
     @Convert(converter = SlugConverter.class)
     private Slug slug;
 
+    @Column(nullable = false)
+    @Convert(converter = PriceConverter.class)
+    private Price price;
+
     public Long getId() {
         return id;
     }
@@ -51,12 +57,21 @@ public class Product {
         this.slug = slug;
     }
 
+    public Price getPrice() {
+        return price;
+    }
+
+    public void setPrice(Price price) {
+        this.price = price;
+    }
+
     @Override
     public String toString() {
         return "Product{" +
                 "id=" + id +
                 ", name='" + name +
                 "', slug='" + slug +
-                "'}";
+                "', price=" + price +
+                "}";
     }
 }

@@ -4,9 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import fr.sidranie.grocery.data.identifier.Identifier;
+import fr.sidranie.grocery.data.price.Price;
 import fr.sidranie.grocery.data.slug.Slug;
 import fr.sidranie.grocery.exception.NotFoundException;
-import jakarta.transaction.Transactional;
 
 @Service
 public class ProductService {
@@ -14,6 +14,7 @@ public class ProductService {
     public static final String MESSAGE_SLUG_ALREADY_EXISTS = "The generated slug (%s) already exists. Please choose another name to generate another slug.";
     public static final String MESSAGE_NO_SLUG_FOUND = "No product with the slug %s found.";
     public static final String MESSAGE_NAME_ALREADY_EXISTS = "A product with the name %s already exists. Please choose another one.";
+    public static final String MESSAGE_INVALID_PRICE = "Invalid price. Price must be 0 or more.";
 
     private final Products products;
 
@@ -30,6 +31,10 @@ public class ProductService {
         updateProductSlugFromName(product, product.getName());
         product.setId(null);
 
+        if (!product.getPrice().isValid()) {
+            throw new IllegalArgumentException(MESSAGE_INVALID_PRICE);
+        }
+
         return products.save(product);
     }
 
@@ -39,8 +44,18 @@ public class ProductService {
             throw new NotFoundException(String.format(MESSAGE_NO_SLUG_FOUND, slug));
         }
 
-        product.setName(updates.getName());
-        updateProductSlugFromName(product, updates.getName());
+        if (updates.getName() != null) {
+            product.setName(updates.getName());
+            updateProductSlugFromName(product, updates.getName());
+        }
+
+        Price price = updates.getPrice();
+        if (price != null) {
+            if (!price.isValid()) {
+                throw new IllegalArgumentException(MESSAGE_INVALID_PRICE);
+            }
+            product.setPrice(updates.getPrice());
+        }
 
         return products.save(product);
     }
@@ -51,10 +66,5 @@ public class ProductService {
             throw new IllegalArgumentException(String.format(MESSAGE_SLUG_ALREADY_EXISTS, slug.getValue()));
         }
         product.setSlug(slug);
-    }
-
-    @Transactional
-    public void deleteBySlug(Slug slug) {
-        products.deleteBySlug(slug);
     }
 }

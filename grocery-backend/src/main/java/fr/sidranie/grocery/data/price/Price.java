@@ -1,28 +1,38 @@
-package fr.sidranie.grocery.data.identifier;
+package fr.sidranie.grocery.data.price;
 
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
-public class Identifier {
-    private String value;
+public class Price {
+    private Float value;
 
-    public Identifier() {
+    public Price() {
     }
 
     @JsonCreator
-    public Identifier(String value) {
+    public Price(Float value) {
         this.value = value;
     }
 
     @JsonValue
-    public String getValue() {
+    public Float getValue() {
         return value;
     }
 
-    public void setValue(String value) {
+    public void setValue(Float value) {
         this.value = value;
+    }
+
+    public boolean isValid() {
+        if (this.value < 0.) {
+            return false;
+        }
+
+        String priceAsString = String.valueOf(this.value);
+        return Pattern.matches("^\\d+\\.+\\d{0,2}$", priceAsString);
     }
 
     @Override
@@ -30,7 +40,7 @@ public class Identifier {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        Identifier that = (Identifier) o;
+        Price that = (Price) o;
         return Objects.equals(value, that.value);
     }
 
@@ -41,7 +51,7 @@ public class Identifier {
 
     @Override
     public String toString() {
-        return "Identifier{'" + value + "'}";
+        return "Price{'" + value + "'}";
     }
 
 }

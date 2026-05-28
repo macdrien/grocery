@@ -19,6 +19,7 @@ import fr.sidranie.grocery.exception.NotFoundException;
 import fr.sidranie.grocery.product.dto.ProductDto;
 import fr.sidranie.grocery.product.transformer.ProductTransformer;
 import fr.sidranie.grocery.security.RoleAdmin;
+import jakarta.transaction.Transactional;
 
 @RestController
 @RequestMapping("/products")
@@ -46,6 +47,7 @@ public class ProductController {
 
     @PostMapping
     @RoleAdmin
+    @Transactional
     public ResponseEntity<Response<Product>> createProduct(@RequestBody ProductDto productDto) {
         Product input = ProductTransformer.productFromProductDto(productDto);
         Product saved;
@@ -59,6 +61,7 @@ public class ProductController {
 
     @PatchMapping("/{slug}")
     @RoleAdmin
+    @Transactional
     public ResponseEntity<Response<Product>> updateProduct(@PathVariable("slug") Slug slug,
                                                            @RequestBody ProductDto productDto) {
         Product input = ProductTransformer.productFromProductDto(productDto);
@@ -75,8 +78,9 @@ public class ProductController {
 
     @DeleteMapping("/{slug}")
     @RoleAdmin
+    @Transactional
     public ResponseEntity<Void> deleteProduct(@PathVariable("slug") Slug slug) {
-        productService.deleteBySlug(slug);
+        products.deleteBySlug(slug);
         return ResponseEntity.noContent().build();
     }
 }
