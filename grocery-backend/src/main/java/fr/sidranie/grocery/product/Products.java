@@ -13,4 +13,6 @@ public interface Products extends JpaRepository<Product, Long> {
     boolean existsByName(Identifier name);
 
     boolean existsBySlug(Slug slug);
+
+    void deleteBySlug(Slug slug);
 }

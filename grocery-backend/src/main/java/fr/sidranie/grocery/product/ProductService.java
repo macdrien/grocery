@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import fr.sidranie.grocery.data.identifier.Identifier;
 import fr.sidranie.grocery.data.slug.Slug;
 import fr.sidranie.grocery.exception.NotFoundException;
+import jakarta.transaction.Transactional;
 
 @Service
 public class ProductService {
@@ -50,5 +51,10 @@ public class ProductService {
             throw new IllegalArgumentException(String.format(MESSAGE_SLUG_ALREADY_EXISTS, slug.getValue()));
         }
         product.setSlug(slug);
+    }
+
+    @Transactional
+    public void deleteBySlug(Slug slug) {
+        products.deleteBySlug(slug);
     }
 }
