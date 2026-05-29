@@ -17,7 +17,6 @@ import fr.sidranie.grocery.Response;
 import fr.sidranie.grocery.data.slug.Slug;
 import fr.sidranie.grocery.exception.NotFoundException;
 import fr.sidranie.grocery.product.dto.ProductDto;
-import fr.sidranie.grocery.product.transformer.ProductTransformer;
 import fr.sidranie.grocery.security.RoleAdmin;
 import jakarta.transaction.Transactional;
 

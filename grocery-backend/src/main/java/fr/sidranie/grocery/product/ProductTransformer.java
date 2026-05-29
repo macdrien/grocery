@@ -1,6 +1,5 @@
-package fr.sidranie.grocery.product.transformer;
+package fr.sidranie.grocery.product;
 
-import fr.sidranie.grocery.product.Product;
 import fr.sidranie.grocery.product.dto.ProductDto;
 
 public class ProductTransformer {
