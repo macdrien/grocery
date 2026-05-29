@@ -33,6 +33,16 @@ public class Product {
     @Convert(converter = PriceConverter.class)
     private Price price;
 
+    public Product() {
+    }
+
+    public Product(Long id, Identifier name, Slug slug, Price price) {
+        this.id = id;
+        this.name = name;
+        this.slug = slug;
+        this.price = price;
+    }
+
     public Long getId() {
         return id;
     }

@@ -2,6 +2,7 @@ package fr.sidranie.grocery.product;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -27,6 +28,7 @@ public class ProductController {
     private final Products products;
     private final ProductService productService;
 
+    @Autowired
     public ProductController(Products products, ProductService productService) {
         this.products = products;
         this.productService = productService;
