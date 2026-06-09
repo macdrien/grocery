@@ -1,5 +1,7 @@
 package fr.sidranie.grocery.product;
 
+import java.util.Objects;
+
 import fr.sidranie.grocery.data.identifier.Identifier;
 import fr.sidranie.grocery.data.identifier.IdentifierConverter;
 import fr.sidranie.grocery.data.price.Price;
@@ -73,6 +75,23 @@ public class Product {
 
     public void setPrice(Price price) {
         this.price = price;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        Product product = (Product) o;
+        return Objects.equals(id, product.id) && Objects.equals(name,
+                                                                product.name) && Objects.equals(
+                slug,
+                product.slug) && Objects.equals(price, product.price);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, slug, price);
     }
 
     @Override
