@@ -38,11 +38,9 @@ public class ProductService {
         return products.save(product);
     }
 
-    public Product updateProduct(Slug slug, Product updates) throws NotFoundException {
-        Product product = products.findBySlug(slug);
-        if (product == null) {
-            throw new NotFoundException(String.format(MESSAGE_NO_SLUG_FOUND, slug));
-        }
+    public Product updateProduct(Long id, Product updates) throws NotFoundException {
+        Product product = products.findById(id)
+                .orElseThrow(() -> new NotFoundException(String.format(MESSAGE_NO_SLUG_FOUND, id)));
 
         if (updates.getName() != null) {
             product.setName(updates.getName());

@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -77,26 +78,26 @@ class ProductControllerTest {
 
     @Test
     @WithMockUser(username = "user")
-    void testGetBySlug() throws Exception {
+    void testGetById() throws Exception {
         Product expected = testProducts.getFirst();
 
-        when(products.findBySlug(expected.getSlug())).thenReturn(expected);
+        when(products.findById(expected.getId())).thenReturn(Optional.of(expected));
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/products/{slug}", expected.getSlug().getValue()))
+        mockMvc.perform(MockMvcRequestBuilders.get("/products/{id}", expected.getId()))
                 .andExpect(status().isOk())
                 .andExpectAll(matchesProduct("$.data", expected));
     }
 
     @Test
     void testGetBySlug_anonymous() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/products/slug"))
+        mockMvc.perform(MockMvcRequestBuilders.get("/products/1"))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
     @WithMockUser(username = "user")
     void testGetBySlug_notFound() throws Exception {
-        mockMvc.perform(MockMvcRequestBuilders.get("/products/slug"))
+        mockMvc.perform(MockMvcRequestBuilders.get("/products/1"))
                 .andExpect(status().isNotFound());
     }
 
@@ -243,10 +244,11 @@ class ProductControllerTest {
         Product input = new Product();
         input.setName(productName);
         input.setPrice(productPrice);
+        Long id = 1L;
         Product expected = new Product(1L, productName, slug, productPrice);
 
-        when(productService.updateProduct(slug, input)).thenReturn(expected);
-        mockMvc.perform(MockMvcRequestBuilders.patch(String.format("/products/%s", slug.getValue()))
+        when(productService.updateProduct(id, input)).thenReturn(expected);
+        mockMvc.perform(MockMvcRequestBuilders.patch("/products/{id}", id)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(inputDto)))
                 .andExpect(status().isOk())
@@ -256,9 +258,9 @@ class ProductControllerTest {
     @Test
     @WithMockUser(username = "user", roles = {"USER", "ADMIN"})
     void testUpdateProduct_duplicateName() throws Exception {
+        Long id = 1L;
         String name = "product";
         Identifier productName = new Identifier(name);
-        Slug slug = new Slug(name);
         Price productPrice = new Price(1.f);
 
         ProductDto inputDto = new ProductDto(
@@ -271,9 +273,9 @@ class ProductControllerTest {
 
         String expectedMessage = String.format(ProductService.MESSAGE_NAME_ALREADY_EXISTS, productName);
 
-        when(productService.updateProduct(slug, input)).thenThrow(new IllegalArgumentException(expectedMessage));
+        when(productService.updateProduct(id, input)).thenThrow(new IllegalArgumentException(expectedMessage));
 
-        mockMvc.perform(MockMvcRequestBuilders.patch("/products/%s".formatted(slug.getValue()))
+        mockMvc.perform(MockMvcRequestBuilders.patch("/products/{id}", id)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(inputDto)))
                 .andExpect(status().isBadRequest())
@@ -283,9 +285,9 @@ class ProductControllerTest {
     @Test
     @WithMockUser(username = "user", roles = {"USER", "ADMIN"})
     void testUpdateProduct_duplicateSlug() throws Exception {
+        Long id = 1L;
         String name = "product";
         Identifier productName = new Identifier(name);
-        Slug slug = new Slug(name);
         Price productPrice = new Price(1.f);
 
         ProductDto inputDto = new ProductDto(
@@ -298,9 +300,9 @@ class ProductControllerTest {
 
         String expectedMessage = String.format(ProductService.MESSAGE_SLUG_ALREADY_EXISTS, productName);
 
-        when(productService.updateProduct(slug, input)).thenThrow(new IllegalArgumentException(expectedMessage));
+        when(productService.updateProduct(id, input)).thenThrow(new IllegalArgumentException(expectedMessage));
 
-        mockMvc.perform(MockMvcRequestBuilders.patch("/products/%s".formatted(slug.getValue()))
+        mockMvc.perform(MockMvcRequestBuilders.patch("/products/{id}", id)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(inputDto)))
                 .andExpect(status().isBadRequest())
@@ -310,9 +312,9 @@ class ProductControllerTest {
     @Test
     @WithMockUser(username = "user", roles = {"USER", "ADMIN"})
     void testUpdateProduct_invalidPrice() throws Exception {
+        Long id = 1L;
         String name = "product";
         Identifier productName = new Identifier(name);
-        Slug slug = new Slug(name);
         Price productPrice = new Price(-1.f);
 
         ProductDto inputDto = new ProductDto(
@@ -323,10 +325,10 @@ class ProductControllerTest {
         input.setName(productName);
         input.setPrice(productPrice);
 
-        when(productService.updateProduct(slug, input))
+        when(productService.updateProduct(id, input))
                 .thenThrow(new IllegalArgumentException(ProductService.MESSAGE_INVALID_PRICE));
 
-        mockMvc.perform(MockMvcRequestBuilders.patch("/products/%s".formatted(slug.getValue()))
+        mockMvc.perform(MockMvcRequestBuilders.patch("/products/{id}", id)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(inputDto)))
                 .andExpect(status().isBadRequest())
@@ -335,15 +337,15 @@ class ProductControllerTest {
 
     @Test
     void testUpdateProduct_anonymous() throws Exception {
+        Long id = 1L;
         String name = "name";
         Identifier identifier = new Identifier(name);
-        Slug slug = new Slug(name);
         ProductDto inputDto = new ProductDto(
                 identifier,
                 new Price(1.f)
         );
 
-        mockMvc.perform(MockMvcRequestBuilders.patch("/products/%s".formatted(slug.getValue()))
+        mockMvc.perform(MockMvcRequestBuilders.patch("/products/{id}", id)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(inputDto)))
                 .andExpect(status().isUnauthorized());
@@ -352,15 +354,15 @@ class ProductControllerTest {
     @Test
     @WithMockUser(username = "user")
     void testUpdateProduct_roleUser() throws Exception {
+        Long id = 1L;
         String name = "name";
         Identifier identifier = new Identifier(name);
-        Slug slug = new Slug(name);
         ProductDto inputDto = new ProductDto(
                 identifier,
                 new Price(1.f)
         );
 
-        mockMvc.perform(MockMvcRequestBuilders.patch("/products/%s".formatted(slug.getValue()))
+        mockMvc.perform(MockMvcRequestBuilders.patch("/products/{id}", id)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(inputDto)))
                 .andExpect(status().isForbidden());
@@ -369,24 +371,24 @@ class ProductControllerTest {
     @Test
     @WithMockUser(username = "user", roles = {"ADMIN"})
     void testDeleteProduct() throws Exception {
-        Slug slug = new Slug("product");
-        doNothing().when(products).deleteBySlug(slug);
-        mockMvc.perform(MockMvcRequestBuilders.delete("/products/%s".formatted(slug.getValue())))
+        Long id = 1L;
+        doNothing().when(products).deleteById(id);
+        mockMvc.perform(MockMvcRequestBuilders.delete("/products/{id}", id))
                 .andExpect(status().isNoContent());
     }
 
     @Test
     void testDeleteProduct_anonymous() throws Exception {
-        Slug slug = new Slug("product");
-        mockMvc.perform(MockMvcRequestBuilders.delete("/products/%s".formatted(slug.getValue())))
+        Long id = 1L;
+        mockMvc.perform(MockMvcRequestBuilders.delete("/products/{id}", id))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
     @WithMockUser(username = "user")
     void testDeleteProduct_roleUser() throws Exception {
-        Slug slug = new Slug("product");
-        mockMvc.perform(MockMvcRequestBuilders.delete("/products/%s".formatted(slug.getValue())))
+        Long id = 1L;
+        mockMvc.perform(MockMvcRequestBuilders.delete("/products/{id}", id))
                 .andExpect(status().isForbidden());
     }
 }

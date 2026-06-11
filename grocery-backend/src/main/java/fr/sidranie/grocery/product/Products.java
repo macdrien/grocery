@@ -8,11 +8,7 @@ import fr.sidranie.grocery.data.slug.Slug;
 
 @Repository
 public interface Products extends JpaRepository<Product, Long> {
-    Product findBySlug(Slug slug);
-
     boolean existsByName(Identifier name);
 
     boolean existsBySlug(Slug slug);
-
-    void deleteBySlug(Slug slug);
 }
