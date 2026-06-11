@@ -25,7 +25,7 @@ public class ProductService {
 
     public Product save(Product product) throws IllegalArgumentException {
         if (products.existsByName(product.getName())) {
-            throw new IllegalArgumentException(String.format(MESSAGE_NAME_ALREADY_EXISTS, product.getName()));
+            throw new IllegalArgumentException(MESSAGE_NAME_ALREADY_EXISTS.formatted(product.getName()));
         }
 
         updateProductSlugFromName(product, product.getName());
@@ -40,7 +40,7 @@ public class ProductService {
 
     public Product updateProduct(Long id, Product updates) throws NotFoundException {
         Product product = products.findById(id)
-                .orElseThrow(() -> new NotFoundException(String.format(MESSAGE_NO_SLUG_FOUND, id)));
+                .orElseThrow(() -> new NotFoundException(MESSAGE_NO_SLUG_FOUND.formatted(id)));
 
         if (updates.getName() != null) {
             product.setName(updates.getName());
@@ -61,7 +61,7 @@ public class ProductService {
     private void updateProductSlugFromName(Product product, Identifier name) {
         Slug slug = Slug.fromString(name.getValue());
         if (products.existsBySlug(slug)) {
-            throw new IllegalArgumentException(String.format(MESSAGE_SLUG_ALREADY_EXISTS, slug.getValue()));
+            throw new IllegalArgumentException(MESSAGE_SLUG_ALREADY_EXISTS.formatted(slug.getValue()));
         }
         product.setSlug(slug);
     }
