@@ -40,7 +40,7 @@ public class ProductController {
     }
 
     @GetMapping("/{slug}")
-    public ResponseEntity<Response<Product>> getBySlug(@PathVariable("slug") Slug slug) {
+    public ResponseEntity<Response<Product>> getBySlug(@PathVariable Slug slug) {
         Product product = products.findBySlug(slug);
 
         return product == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(new Response<>(product));
@@ -63,7 +63,7 @@ public class ProductController {
     @PatchMapping("/{slug}")
     @RoleAdmin
     @Transactional
-    public ResponseEntity<Response<Product>> updateProduct(@PathVariable("slug") Slug slug,
+    public ResponseEntity<Response<Product>> updateProduct(@PathVariable Slug slug,
                                                            @RequestBody ProductDto productDto) {
         Product input = ProductTransformer.productFromProductDto(productDto);
         Product saved;
@@ -80,7 +80,7 @@ public class ProductController {
     @DeleteMapping("/{slug}")
     @RoleAdmin
     @Transactional
-    public ResponseEntity<Void> deleteProduct(@PathVariable("slug") Slug slug) {
+    public ResponseEntity<Void> deleteProduct(@PathVariable Slug slug) {
         products.deleteBySlug(slug);
         return ResponseEntity.noContent().build();
     }
