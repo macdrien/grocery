@@ -12,7 +12,7 @@ import fr.sidranie.grocery.exception.NotFoundException;
 public class ProductService {
 
     public static final String MESSAGE_SLUG_ALREADY_EXISTS = "The generated slug (%s) already exists. Please choose another name to generate another slug.";
-    public static final String MESSAGE_NO_SLUG_FOUND = "No product with the slug %s found.";
+    public static final String MESSAGE_NO_PRODUCT_WITH_ID_FOUND = "No product with the id %s found.";
     public static final String MESSAGE_NAME_ALREADY_EXISTS = "A product with the name %s already exists. Please choose another one.";
     public static final String MESSAGE_INVALID_PRICE = "Invalid price. Price must be 0 or more.";
 
@@ -25,7 +25,7 @@ public class ProductService {
 
     public Product save(Product product) throws IllegalArgumentException {
         if (products.existsByName(product.getName())) {
-            throw new IllegalArgumentException(MESSAGE_NAME_ALREADY_EXISTS.formatted(product.getName()));
+            throw new IllegalArgumentException(MESSAGE_NAME_ALREADY_EXISTS.formatted(product.getName().getValue()));
         }
 
         updateProductSlugFromName(product, product.getName());
@@ -40,9 +40,12 @@ public class ProductService {
 
     public Product updateProduct(Long id, Product updates) throws NotFoundException {
         Product product = products.findById(id)
-                .orElseThrow(() -> new NotFoundException(MESSAGE_NO_SLUG_FOUND.formatted(id)));
+                .orElseThrow(() -> new NotFoundException(MESSAGE_NO_PRODUCT_WITH_ID_FOUND.formatted(id)));
 
         if (updates.getName() != null) {
+            if (products.existsByName(product.getName())) {
+                throw new IllegalArgumentException(MESSAGE_NAME_ALREADY_EXISTS.formatted(product.getName()));
+            }
             product.setName(updates.getName());
             updateProductSlugFromName(product, updates.getName());
         }
