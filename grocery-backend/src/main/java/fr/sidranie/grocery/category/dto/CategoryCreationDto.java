@@ -2,22 +2,13 @@ package fr.sidranie.grocery.category.dto;
 
 import fr.sidranie.grocery.data.identifier.Identifier;
 
-public class CategoryDto {
-    private Long id;
+public class CategoryCreationDto {
     private Identifier name;
     private Long parentId;
 
-    public CategoryDto(Long id, Identifier name) {
-        this.id = id;
+    public CategoryCreationDto(Identifier name, Long parentId) {
         this.name = name;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
+        this.parentId = parentId;
     }
 
     public Identifier getName() {
@@ -39,8 +30,7 @@ public class CategoryDto {
     @Override
     public String toString() {
         return "CategoryDto{" +
-                "id=" + id +
-                ", name=" + name +
+                "name=" + name +
                 ", parentId=" + parentId +
                 '}';
     }

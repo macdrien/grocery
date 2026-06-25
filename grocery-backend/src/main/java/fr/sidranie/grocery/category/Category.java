@@ -11,7 +11,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -25,7 +25,7 @@ public class Category {
     @Convert(converter = IdentifierConverter.class)
     private Identifier name;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "parent_id", referencedColumnName = "id")
     private Category parent;
 
@@ -66,10 +66,9 @@ public class Category {
             return false;
         }
         Category category = (Category) o;
-        return Objects.equals(id, category.id) && Objects.equals(name,
-                                                                 category.name) && Objects.equals(
-                parent,
-                category.parent);
+        return Objects.equals(id, category.id) &&
+                Objects.equals(name, category.name) &&
+                Objects.equals(parent, category.parent);
     }
 
     @Override

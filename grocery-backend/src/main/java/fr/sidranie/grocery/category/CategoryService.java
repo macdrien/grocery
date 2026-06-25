@@ -1,5 +1,7 @@
 package fr.sidranie.grocery.category;
 
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,15 +17,18 @@ public class CategoryService {
 
     public Category save(Category category) {
         if (categories.existsByName(category.getName())) {
-            throw new IllegalArgumentException(String.format(MESSAGE_NAME_ALREADY_EXISTS, category.getName()));
+            throw new IllegalArgumentException(MESSAGE_NAME_ALREADY_EXISTS.formatted(category.getName()));
         }
 
         category.setId(null);
 
-        if (category.getParent() != null &&
-                categories.existsById(category.getParent().getId())) {
-            throw new IllegalArgumentException(String.format(MESSAGE_PARENT_NOT_EXISTING,
-                                                             category.getParent().getId()));
+        if (category.getParent() != null) {
+            Optional<Category> parent = categories.findById(category.getParent().getId());
+            if (parent.isPresent()) {
+                category.setParent(parent.get());
+            } else {
+                throw new IllegalArgumentException(MESSAGE_PARENT_NOT_EXISTING.formatted(category.getParent().getId()));
+            }
         }
 
         return categories.save(category);
